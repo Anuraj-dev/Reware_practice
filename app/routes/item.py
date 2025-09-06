@@ -24,7 +24,7 @@ def index():
 @login_required
 def renderNewPage():
     current_user = get_current_user()
-    return render_template("items/new.html", current_user=current_user)  # Fixed the parameter
+    return render_template("items/new.html", current_user=current_user)
 
 @item.route("/", methods=["POST"])
 @login_required
@@ -95,7 +95,7 @@ def showListing(item_id):
     if current_user:
         existing_request = SwapRequest.query.filter_by(
             requester_id=current_user.id,
-            item_id=item_id,
+            requested_item_id=item_id,
             status='pending'
         ).first()
 
@@ -196,173 +196,4 @@ def deleteListing(item_id):
 @item.route("/dashboard")
 @login_required
 def dashboard():
-    current_user = get_current_user()
-    
-    # Get user's items
-    user_items = Item.query.filter_by(user_id=current_user.id).all()
-    
-    # Get user's swap requests (requests made by user)
-    user_requests = SwapRequest.query.filter_by(requester_id=current_user.id).all()
-    
-    # Get requests for user's items (requests received by user)
-    item_ids = [item.id for item in user_items]
-    received_requests = SwapRequest.query.filter(SwapRequest.item_id.in_(item_ids)).all() if item_ids else []
-    
-    return render_template("items/dashboard.html", 
-                         current_user=current_user,
-                         user_items=user_items,
-                         user_requests=user_requests,
-                         received_requests=received_requests)
-
-# Route to handle swap requests
-@item.route("/<int:item_id>/request", methods=["POST"])
-@login_required
-def requestSwap(item_id):
-    try:
-        current_user = get_current_user()
-        current_item = Item.query.get_or_404(item_id)
-        
-        # Check if user is trying to request their own item
-        if current_item.user_id == current_user.id:
-            flash('You cannot request your own item', 'danger')
-            return redirect(url_for('item.showListing', item_id=item_id))
-        
-        # Check if user has enough points
-        if current_user.points < current_item.points_cost:
-            flash('You do not have enough points for this item', 'danger')
-            return redirect(url_for('item.showListing', item_id=item_id))
-        
-        # Check if user already has a pending request for this item
-        existing_request = SwapRequest.query.filter_by(
-            requester_id=current_user.id,
-            item_id=item_id,
-            status='pending'
-        ).first()
-        
-        if existing_request:
-            flash('You already have a pending request for this item', 'warning')
-            return redirect(url_for('item.showListing', item_id=item_id))
-        
-        # Create new swap request
-        new_request = SwapRequest(
-            requester_id=current_user.id,
-            item_id=item_id,
-            status='pending'
-        )
-        
-        db.session.add(new_request)
-        db.session.commit()
-        
-        flash('Swap request sent successfully!', 'success')
-        return redirect(url_for('item.showListing', item_id=item_id))
-        
-    except Exception as e:
-        db.session.rollback()
-        flash('An error occurred while sending the request. Please try again.', 'danger')
-        return redirect(url_for('item.showListing', item_id=item_id))
-
-# Route to handle swap request responses
-@item.route("/requests/<int:request_id>/respond", methods=["POST"])
-@login_required
-def respondToRequest(request_id):
-    try:
-        current_user = get_current_user()
-        swap_request = SwapRequest.query.get_or_404(request_id)
-        action = request.form.get('action')  # 'accept' or 'decline'
-        
-        # Check if user owns the item being requested
-        if swap_request.item.user_id != current_user.id:
-            flash('You are not authorized to respond to this request', 'danger')
-            return redirect(url_for('item.dashboard'))
-        
-        if action == 'accept':
-            # Process the swap
-            requester = swap_request.requester
-            item = swap_request.item
-            
-            # Transfer points
-            requester.points -= item.points_cost
-            current_user.points += item.points_cost
-            
-            # Update request status
-            swap_request.status = 'completed'
-            
-            # Remove the item (since it's been swapped)
-            db.session.delete(item)
-            
-            flash('Swap completed successfully!', 'success')
-            
-        elif action == 'decline':
-            # Just delete the request
-            db.session.delete(swap_request)
-            flash('Request declined', 'info')
-        
-        db.session.commit()
-        return redirect(url_for('item.dashboard'))
-        
-    except Exception as e:
-        db.session.rollback()
-        flash('An error occurred while processing the request. Please try again.', 'danger')
-        return redirect(url_for('item.dashboard'))
-
-# API route to get items with filters
-@item.route("/api/items")
-def getItems():
-    try:
-        # Get query parameters
-        category = request.args.get('category')
-        condition = request.args.get('condition')
-        size = request.args.get('size')
-        min_points = request.args.get('min_points', type=int)
-        max_points = request.args.get('max_points', type=int)
-        search = request.args.get('search')
-        
-        # Build query
-        query = Item.query
-        
-        if category:
-            query = query.filter(Item.category == category)
-        
-        if condition:
-            query = query.filter(Item.condition == condition)
-        
-        if size:
-            query = query.filter(Item.size == size)
-        
-        if min_points:
-            query = query.filter(Item.points_cost >= min_points)
-        
-        if max_points:
-            query = query.filter(Item.points_cost <= max_points)
-        
-        if search:
-            query = query.filter(
-                or_(
-                    Item.title.contains(search),
-                    Item.description.contains(search)
-                )
-            )
-        
-        items = query.all()
-        
-        # Convert to JSON
-        items_data = []
-        for item in items:
-            items_data.append({
-                'id': item.id,
-                'title': item.title,
-                'description': item.description,
-                'category': item.category,
-                'size': item.size,
-                'condition': item.condition,
-                'image_url': item.image_url,
-                'points_cost': item.points_cost,
-                'owner': item.owner.user_name,
-                'created_at': item.created_at.isoformat()
-            })
-        
-        return jsonify({'items': items_data, 'count': len(items_data)})
-        
-    except Exception as e:
-        return jsonify({'error': 'Failed to fetch items'}), 500
-
+    return render_template("items/index.html")
