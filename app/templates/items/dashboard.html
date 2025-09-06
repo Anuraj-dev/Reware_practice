@@ -1,1 +1,619 @@
-{# Implement dashboard #}
+{% extends 'base.html' %}
+{% block title %}Dashboard · Rewear{% endblock %}
+
+{% block head_extra %}
+<style>
+/* Dashboard-specific styles */
+.dashboard-hero {
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    padding: var(--space-xl) 0;
+    margin-bottom: var(--space-xl);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 40%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.stat-card {
+    text-align: center;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(20px);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dashboard-section {
+    margin-bottom: var(--space-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.swap-request-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+    backdrop-filter: blur(20px);
+    transition: var(--transition);
+}
+
+.swap-request-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.swap-items {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-md);
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.swap-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--glass);
+    border-radius: var(--radius);
+    border: 1px solid var(--glass-border);
+}
+
+.swap-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--glass-border);
+}
+
+.swap-arrow {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    background: var(--glass);
+    padding: var(--space-sm);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--glass-border);
+}
+
+.swap-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.swap-status {
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.swap-status.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.swap-status.completed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.swap-status.declined {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.swap-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.quick-actions {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--text-muted);
+    background: var(--glass);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--glass-border);
+}
+
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.dashboard-item-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.item-overlay {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    display: flex;
+    gap: var(--space-xs);
+    z-index: 10;
+}
+
+.item-badge {
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-overlay);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    color: var(--text-light);
+    border: 1px solid var(--glass-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+    
+    .quick-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .swap-items {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+        text-align: center;
+    }
+    
+    .swap-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .swap-meta {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .swap-actions {
+        justify-content: center;
+    }
+    
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-hero {
+        padding: var(--space-lg) var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Dashboard Hero Section -->
+    <section class="dashboard-hero">
+        <div class="container" style="position: relative; z-index: 2;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-lg);">
+                <div>
+                    <h1 style="font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-sm); background: linear-gradient(135deg, var(--text), var(--text-light)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                        Welcome back, {{ current_user.username }}!
+                    </h1>
+                    <p style="color: var(--text-light); font-size: 1.1rem; margin: 0;">
+                        Member since {{ current_user.created_at.strftime('%B %Y') }}
+                    </p>
+                </div>
+                <div class="quick-actions">
+                    <a href="{{ url_for('item.renderNewPage') }}" class="btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        New Listing
+                    </a>
+                    <a href="{{ url_for('item.index') }}" class="btn ghost">Browse Items</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Statistics -->
+    <section class="user-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ current_user.points }}</div>
+            <div class="stat-label">Points Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ user_items|length }}</div>
+            <div class="stat-label">Active Listings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ incoming_requests|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+            <div class="stat-label">Pending Requests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ (incoming_requests|selectattr('status', 'equalto', 'completed')|list|length) + (outgoing_requests|selectattr('status', 'equalto', 'completed')|list|length) }}</div>
+            <div class="stat-label">Completed Swaps</div>
+        </div>
+    </section>
+
+    <!-- Incoming Swap Requests -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-sm); vertical-align: middle;">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+                Incoming Swap Requests
+            </h2>
+            {% if incoming_requests|selectattr('status', 'equalto', 'pending')|list|length > 0 %}
+                <span class="badge points">{{ incoming_requests|selectattr('status', 'equalto', 'pending')|list|length }} pending</span>
+            {% endif %}
+        </div>
+        
+        {% set pending_incoming = incoming_requests|selectattr('status', 'equalto', 'pending')|list %}
+        {% if pending_incoming %}
+            {% for request in pending_incoming %}
+                <div class="swap-request-card">
+                    <div class="swap-items">
+                        <div class="swap-item">
+                            {% if request.offered_item.image_url %}
+                                <img src="{{ request.offered_item.image_url }}" alt="{{ request.offered_item.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ request.offered_item.title }}">
+                            {% endif %}
+                            <div>
+                                <h4 style="margin: 0 0 var(--space-xs) 0; font-size: 1rem;">{{ request.offered_item.title }}</h4>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">{{ request.offered_item.points_cost }} points</p>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">by {{ request.requester.username }}</p>
+                            </div>
+                        </div>
+                        <div class="swap-arrow">⇄</div>
+                        <div class="swap-item">
+                            {% if request.item.image_url %}
+                                <img src="{{ request.item.image_url }}" alt="{{ request.item.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ request.item.title }}">
+                            {% endif %}
+                            <div>
+                                <h4 style="margin: 0 0 var(--space-xs) 0; font-size: 1rem;">{{ request.item.title }}</h4>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">{{ request.item.points_cost }} points</p>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">your item</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swap-meta">
+                        <div style="display: flex; align-items: center; gap: var(--space-md);">
+                            <span class="swap-status {{ request.status }}">{{ request.status }}</span>
+                            <small style="color: var(--text-muted);">{{ request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                        </div>
+                        <div class="swap-actions">
+                            <form method="POST" action="{{ url_for('item.acceptSwap', swap_id=request.id) }}" style="display: inline;">
+                                <button type="submit" class="btn success" data-confirm="Accept this swap? Items will be exchanged immediately.">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 6L9 17l-5-5"></path>
+                                    </svg>
+                                    Accept
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('item.declineSwap', swap_id=request.id) }}" style="display: inline;">
+                                <button type="submit" class="btn ghost" data-confirm="Decline this swap request?">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M18 6L6 18M6 6l12 12"></path>
+                                    </svg>
+                                    Decline
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+                <h3 style="margin: 0 0 var(--space-sm) 0; color: var(--text-muted);">No pending requests</h3>
+                <p style="margin: 0; color: var(--text-disabled);">When someone wants to swap with your items, they'll appear here.</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Outgoing Swap Requests -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-sm); vertical-align: middle;">
+                    <path d="M7 7l10 10M7 17L17 7"></path>
+                </svg>
+                Your Swap Requests
+            </h2>
+            {% if outgoing_requests|selectattr('status', 'equalto', 'pending')|list|length > 0 %}
+                <span class="badge">{{ outgoing_requests|selectattr('status', 'equalto', 'pending')|list|length }} pending</span>
+            {% endif %}
+        </div>
+        
+        {% set recent_outgoing = outgoing_requests|sort(attribute='created_at', reverse=true) %}
+        {% if recent_outgoing %}
+            {% for request in recent_outgoing[:5] %}
+                <div class="swap-request-card">
+                    <div class="swap-items">
+                        <div class="swap-item">
+                            {% if request.offered_item.image_url %}
+                                <img src="{{ request.offered_item.image_url }}" alt="{{ request.offered_item.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ request.offered_item.title }}">
+                            {% endif %}
+                            <div>
+                                <h4 style="margin: 0 0 var(--space-xs) 0; font-size: 1rem;">{{ request.offered_item.title }}</h4>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">{{ request.offered_item.points_cost }} points</p>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">your item</p>
+                            </div>
+                        </div>
+                        <div class="swap-arrow">⇄</div>
+                        <div class="swap-item">
+                            {% if request.item.image_url %}
+                                <img src="{{ request.item.image_url }}" alt="{{ request.item.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ request.item.title }}">
+                            {% endif %}
+                            <div>
+                                <h4 style="margin: 0 0 var(--space-xs) 0; font-size: 1rem;">{{ request.item.title }}</h4>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">{{ request.item.points_cost }} points</p>
+                                <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">by {{ request.item.owner.username }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swap-meta">
+                        <div style="display: flex; align-items: center; gap: var(--space-md);">
+                            <span class="swap-status {{ request.status }}">{{ request.status }}</span>
+                            <small style="color: var(--text-muted);">{{ request.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                        </div>
+                        {% if request.status == 'pending' %}
+                            <div class="swap-actions">
+                                <form method="POST" action="{{ url_for('item.cancelSwap', swap_id=request.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn ghost" data-confirm="Cancel this swap request?">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M18 6L6 18M6 6l12 12"></path>
+                                        </svg>
+                                        Cancel
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            {% if outgoing_requests|length > 5 %}
+                <div style="text-align: center; margin-top: var(--space-lg);">
+                    <p style="color: var(--text-muted);">Showing 5 of {{ outgoing_requests|length }} requests</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 7l10 10M7 17L17 7"></path>
+                </svg>
+                <h3 style="margin: 0 0 var(--space-sm) 0; color: var(--text-muted);">No swap requests yet</h3>
+                <p style="margin: 0 0 var(--space-md) 0; color: var(--text-disabled);">Browse items and make your first swap request!</p>
+                <a href="{{ url_for('item.index') }}" class="btn ghost">Browse Items</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Your Listings -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-sm); vertical-align: middle;">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                </svg>
+                Your Listings
+            </h2>
+            <a href="{{ url_for('item.renderNewPage') }}" class="btn ghost">Add New</a>
+        </div>
+        
+        {% if user_items %}
+            <div class="items-grid">
+                {% for item in user_items %}
+                    <article class="card dashboard-item-card">
+                        <div class="item-overlay">
+                            <span class="item-badge">{{ item.points_cost }} pts</span>
+                            {% set item_requests = incoming_requests|selectattr('item_id', 'equalto', item.id)|selectattr('status', 'equalto', 'pending')|list %}
+                            {% if item_requests|length > 0 %}
+                                <span class="item-badge" style="background: rgba(245, 158, 11, 0.3); color: var(--warning);">
+                                    {{ item_requests|length }} request{{ 's' if item_requests|length != 1 else '' }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('item.showListing', item_id=item.id) }}" class="media">
+                            {% if item.image_url %}
+                                <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ item.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+                            {% endif %}
+                        </a>
+                        <div class="content">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-sm);">
+                                <h3 style="margin: 0; font-size: 1.1rem; line-height: 1.3;">{{ item.title }}</h3>
+                            </div>
+                            {% if item.description %}
+                                <p style="margin: 0 0 var(--space-sm) 0; color: var(--text-muted); font-size: 0.9rem; line-height: 1.4;">
+                                    {{ item.description[:80] }}{% if item.description|length > 80 %}...{% endif %}
+                                </p>
+                            {% endif %}
+                            <div style="display: flex; gap: var(--space-xs); margin-bottom: var(--space-md); flex-wrap: wrap;">
+                                <span class="badge">{{ item.category }}</span>
+                                <span class="badge">{{ item.size }}</span>
+                            </div>
+                            <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+                                <a href="{{ url_for('item.showListing', item_id=item.id) }}" class="btn ghost" style="flex: 1; min-width: 100px;">View</a>
+                                <a href="{{ url_for('item.renderEditPage', item_id=item.id) }}" class="btn ghost" style="flex: 1; min-width: 80px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                </svg>
+                <h3 style="margin: 0 0 var(--space-sm) 0; color: var(--text-muted);">No listings yet</h3>
+                <p style="margin: 0 0 var(--space-md) 0; color: var(--text-disabled);">Start by creating your first listing to join the swap community!</p>
+                <a href="{{ url_for('item.renderNewPage') }}" class="btn">Create Your First Listing</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Enhanced dashboard interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh pending requests count every 30 seconds
+    setInterval(function() {
+        const pendingCount = document.querySelectorAll('.swap-status.pending').length;
+        if (pendingCount > 0) {
+            // Could implement real-time updates here
+            console.log(`${pendingCount} pending requests`);
+        }
+    }, 30000);
+
+    // Add loading states to action buttons
+    document.querySelectorAll('form[data-confirm] button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            if (button.form.getAttribute('data-confirm')) {
+                const confirmed = confirm(button.form.getAttribute('data-confirm'));
+                if (confirmed) {
+                    button.disabled = true;
+                    button.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+                            <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+                        </svg>
+                        Processing...
+                    `;
+                } else {
+                    e.preventDefault();
+                }
+            }
+        });
+    });
+
+    // Add spin animation
+    if (!document.querySelector('#spin-animation')) {
+        const style = document.createElement('style');
+        style.id = 'spin-animation';
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});
+</script>
+{% endblock %}

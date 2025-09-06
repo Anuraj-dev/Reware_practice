@@ -1,1 +1,54 @@
-{# # Render new listing form #}
+{% extends 'base.html' %}
+{% block title %}New Listing · Rewear{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="card card-body" style="margin-bottom: .8rem;">
+      <h1>Create a listing</h1>
+      <p class="help">List an item to earn points and help it find a new home. Choose the right category and size for better visibility.</p>
+    </div>
+    <form class="form card card-body" method="POST" action="{{ url_for('item.createListing') }}">
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" placeholder="Vintage denim jacket" required minlength="3" />
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <input id="description" name="description" type="text" placeholder="Tell us about the item..." />
+      </div>
+      <div class="grid responsive-form">
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category" class="select">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="kids">Kids</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="size">Size</label>
+          <select id="size" name="size" class="select">
+            <option>S</option>
+            <option selected>M</option>
+            <option>L</option>
+            <option>XL</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="points_cost">Points cost</label>
+          <input id="points_cost" name="points_cost" type="number" min="1" step="1" placeholder="10" required />
+        </div>
+      </div>
+      <div class="field">
+        <label for="image_url">Image URL</label>
+        <input id="image_url" name="image_url" type="url" placeholder="https://..." />
+      </div>
+      <div style="display:flex; gap:.6rem; flex-wrap: wrap;">
+        <button class="btn" type="submit">Create</button>
+        <a class="btn ghost" href="{{ url_for('item.index') }}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

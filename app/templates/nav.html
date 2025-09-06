@@ -1,11 +1,12 @@
 <a class="brand" href="{{ url_for('root') }}" aria-label="Rewear home">
     <img src="{{ url_for('static', filename='images/favicon_and_logo.svg') }}" alt="Rewear logo" />
-    <span class="brand-name">Rewear</span>
+    <span>Rewear</span>
 </a>
 <nav class="navlinks" aria-label="Primary">
-    <a href="{{ url_for('root') }}">Listings</a>
+    <a href="{{ url_for('item.index') }}">Listings</a>
     {% if session.get('user_id') %}
-        <span>Hi, {{ session.get('username') or 'User' }}</span>
+        <span style="opacity:.8; padding:.35rem .5rem;">Hi, {{ session.get('username') or 'User' }}</span>
+        <a class="btn ghost" href="{{ url_for('auth.logout') }}">Logout</a>
     {% else %}
         <a class="btn ghost" href="{{ url_for('auth.login') }}">Login</a>
         <a class="cta-btn" href="{{ url_for('auth.register') }}">Sign up</a>

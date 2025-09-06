@@ -1,3 +1,67 @@
-{% extends 'base.html' %} {% block title %}Rewear · Swap smart, waste less{%
-endblock %} {% block head_extra %}{% endblock %} {% block content %} {# Show all
-available listings here #} {% endblock %} {% block scripts %}{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Listings · Rewear{% endblock %}
+
+{% block content %}
+<section class="section">
+  <header class="container" style="display:grid; gap:.5rem; margin-bottom: .5rem;">
+    <h1 style="letter-spacing:-.3px;">Browse Listings</h1>
+    {% if current_user %}
+      <p class="help">Hi {{ current_user.username }}, you have <strong>{{ current_user.points }}</strong> points.</p>
+    {% endif %}
+  </header>
+
+  <div class="container card card-body" style="margin-bottom: 1rem;">
+    <div class="toolbar">
+      <input id="searchListings" class="input" type="search" placeholder="Search items..." aria-label="Search listings" />
+      <select class="select" aria-label="Filter by category" disabled>
+        <option value="">Category (coming soon)</option>
+      </select>
+      <select class="select" aria-label="Filter by size" disabled>
+        <option value="">Size (coming soon)</option>
+      </select>
+      <div style="flex: 1 1 auto"></div>
+      {% if current_user %}
+        <a class="btn" href="{{ url_for('item.renderNewPage') }}">New listing</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container grid cols-3" id="listingGrid">
+    {% if items %}
+      {% for it in items %}
+        <article class="card listing-card" data-title="{{ it.title|lower }} {{ it.category|lower }} {{ it.size|lower }}">
+          <a href="{{ url_for('item.showListing', item_id=it.id) }}" class="media" aria-label="View {{ it.title }}">
+            {% if it.image_url %}
+              <img src="{{ it.image_url }}" alt="{{ it.title }} image">
+            {% else %}
+              <img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="{{ it.title }} placeholder">
+            {% endif %}
+          </a>
+          <div class="content card-body" style="display:grid; gap:.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:.6rem;">
+              <h3 style="margin:0; font-size:1.05rem;">{{ it.title }}</h3>
+              <span class="badge points" title="Points cost">{{ it.points_cost }} pts</span>
+            </div>
+            <div style="display:flex; gap:.4rem; flex-wrap:wrap;">
+              <span class="badge">{{ it.category }}</span>
+              <span class="badge">{{ it.size }}</span>
+            </div>
+            <div style="display:flex; gap:.5rem; align-items:center; justify-content:flex-end;">
+              <a class="btn ghost" href="{{ url_for('item.showListing', item_id=it.id) }}">View</a>
+              {% if current_user and current_user.id == it.user_id %}
+                <a class="btn secondary" href="{{ url_for('item.renderEditPage', item_id=it.id) }}">Edit</a>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="card card-body">
+        <p>No listings yet. {% if current_user %}<a href="{{ url_for('item.renderNewPage') }}">Create the first one</a>.{% else %}<a href="{{ url_for('auth.login') }}">Login</a> to add a listing.{% endif %}</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

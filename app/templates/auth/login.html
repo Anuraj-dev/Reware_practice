@@ -4,6 +4,7 @@
 {% block content %}
 <section class="section">
   <div class="container auth-split">
+    <div class="auth-visual bg" aria-hidden="true" data-bg="{{ url_for('static', filename='images/image4.jpg') }}"></div>
     <div class="auth-card">
       <h1>Welcome back</h1>
       <p class="help">Log in to continue swapping.</p>
@@ -25,9 +26,6 @@
           <a class="btn ghost" href="{{ url_for('auth.register') }}" data-auth-transition="register">Create account</a>
         </div>
       </form>
-    </div>
-    <div class="auth-visual">
-      <img id="loginVisual" src="{{ url_for('static', filename='images/image4.jpg') }}" alt="Login to Rewear visual">
     </div>
   </div>
 </section>

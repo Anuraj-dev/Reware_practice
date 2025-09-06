@@ -1,1 +1,61 @@
-{# #render product edit page (hint: copy paste new page but add the values in form) #}
+{% extends 'base.html' %}
+{% block title %}Edit Listing · Rewear{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="card card-body" style="margin-bottom: .8rem;">
+      <h1>Edit listing</h1>
+      <p class="help">Update the details below and save your changes. Make sure the category and size are accurate.</p>
+    </div>
+    <form class="form card card-body" method="POST" action="{{ url_for('item.upadateListing', item_id=item.id) }}">
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" placeholder="Vintage denim jacket" required minlength="3" value="{{ item.title }}" />
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <input id="description" name="description" type="text" placeholder="Tell us about the item..." value="{{ item.description or '' }}" />
+      </div>
+      <div class="grid responsive-form">
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category" class="select">
+            <option value="male" {{ 'selected' if item.category == 'male' else '' }}>Male</option>
+            <option value="female" {{ 'selected' if item.category == 'female' else '' }}>Female</option>
+            <option value="kids" {{ 'selected' if item.category == 'kids' else '' }}>Kids</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="size">Size</label>
+          <select id="size" name="size" class="select">
+            <option value="S" {{ 'selected' if item.size == 'S' else '' }}>S</option>
+            <option value="M" {{ 'selected' if item.size == 'M' else '' }}>M</option>
+            <option value="L" {{ 'selected' if item.size == 'L' else '' }}>L</option>
+            <option value="XL" {{ 'selected' if item.size == 'XL' else '' }}>XL</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="points_cost">Points cost</label>
+          <input id="points_cost" name="points_cost" type="number" min="1" step="1" placeholder="10" required value="{{ item.points_cost }}" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="image_url">Image URL</label>
+        <input id="image_url" name="image_url" type="url" placeholder="https://..." value="{{ item.image_url or '' }}" />
+      </div>
+      <div style="display:flex; gap:.6rem; align-items:center; flex-wrap: wrap;">
+        <button class="btn" type="submit">Save changes</button>
+        <a class="btn ghost" href="{{ url_for('item.showListing', item_id=item.id) }}">Cancel</a>
+        {% if current_user and (current_user.id == item.user_id or current_user.is_admin) %}
+          <button class="btn secondary" type="submit" form="deleteForm_{{ item.id }}">Delete</button>
+        {% endif %}
+      </div>
+    </form>
+
+    {% if current_user and (current_user.id == item.user_id or current_user.is_admin) %}
+      <form id="deleteForm_{{ item.id }}" method="POST" action="{{ url_for('item.deleteListing', item_id=item.id) }}" data-confirm="Delete this listing? This cannot be undone."></form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
