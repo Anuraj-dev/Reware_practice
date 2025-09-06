@@ -21,7 +21,7 @@ def renderNewPage():
     current_user = get_current_user()
     return render_template("items/new.html", get_current_user)
 
-@item.route("/", method=["POST"])
+@item.route("/", methods=["POST"])
 def createListing():
     try:
         current_user=get_current_user()
@@ -45,7 +45,7 @@ def createListing():
 def showListing(item_id):
     current_item = Item.query.get_or_404(item_id)
 
-    return render_template("item/show.html", item=current_item)
+    return render_template("items/show.html", item=current_item)
 
 @item.route("/<item_id>/edit")
 @login_required
@@ -55,7 +55,7 @@ def renderEditPage(item_id):
 
     #Check if user owns this listing
 
-    return render_template("/item/edit.html", item=current_item, current_user=current_user)
+    return render_template("/items/edit.html", item=current_item, current_user=current_user)
 
 @item.route("/<item_id>", methods=["POST"])
 @login_required
@@ -84,9 +84,9 @@ def upadateListing(item_id):
         flash('An error occurred while updating the listing. Please try again.', 'danger')
         return redirect(url_for('item.renderEditPage', item_id=item_id))
     
-#Create Swap request route
-@item.route("/<item_id>/swap", methods=["POST"])
+# Create a route for item dashboard in which user will be redirected towards and should contain all user data
+@item.route("/dashboard")
 @login_required
-def createSwapRequest(item_id):
+def dashboard():
+    return render_template("item/index.html")
     
-    return redirect(url_for('item.showListing', item_id=item_id))
