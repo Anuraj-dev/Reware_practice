@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
@@ -10,8 +10,18 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # Session configuration
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+
     db.init_app(app)
 
+    from .routes.auth import auth
+    app.register_blueprint(auth, url_prefix='/auth')
+
+    @app.route("/")
+    def root():
+        return render_template("landing_page.html")
 
 
     migrate = Migrate(app, db)
