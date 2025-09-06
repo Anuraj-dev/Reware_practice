@@ -20,7 +20,7 @@ def create_app():
     from .routes.item import item
 
     app.register_blueprint(auth, url_prefix='/auth')
-    app.register_blueprint(item, url_prefix='/item')
+    app.register_blueprint(item, url_prefix='/items')
 
     @app.route("/")
     def root():
