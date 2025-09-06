@@ -31,6 +31,7 @@ def createListing():
         #Validation
 
         #Create new Listing
+        db.session.commit()
 
         flash('Listing created successfully!', 'success')    #!Not for AI: "It will be available after admin approval."
         return redirect(url_for('item.index'))
@@ -39,3 +40,47 @@ def createListing():
         db.session.rollback()
         flash('An error occurred while creating the listing. Please try again.', 'danger')
         return redirect(url_for('item.renderNewPage'))
+
+@item.route("/<item_id>")
+def showListing(item_id):
+    current_item = Item.query.get_or_404(item_id)
+
+    return render_template("item/show.html", item=current_item)
+
+@item.route("/<item_id>/edit")
+@login_required
+def renderEditPage(item_id):
+    current_item = Item.query.get_or_404(item_id)
+    current_user = get_current_user()
+
+    #Check if user owns this listing
+
+    return render_template("/item/edit.html", item=current_item, current_user=current_user)
+
+@item.route("/<item_id>", methods=["POST"])
+@login_required
+def upadateListing(item_id):
+    try:
+        current_item = Item.query.get_or_404(item_id)
+        current_user = get_current_user()
+
+        #Check if current user owns listing
+
+        #Get form data
+
+        #Validation
+
+        #Update Listing
+
+        #!Not for AI: Admin here
+
+        db.session.commit()
+
+        flash('Listing updated successfully!', 'success')
+        return redirect(url_for('item.showListing', item_id=item_id))
+
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred while updating the listing. Please try again.', 'danger')
+        return redirect(url_for('item.renderEditPage', item_id=item_id))
+    
