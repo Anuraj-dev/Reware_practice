@@ -16,7 +16,7 @@ class User(db.Model):
     
     # Relationships
     items = db.relationship('Item', backref='owner', lazy=True, cascade='all, delete-orphan')
-    swap_requests = db.relationship('SwapRequest', foreign_keys='SwapRequest.requester_id', backref='requester', lazy=True, cascade='all, delete-orphan')
+    swap_requests = db.relationship('SwapRequest', foreign_keys='[SwapRequest.requester_id]', backref='requester', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<User {self.username}>'
@@ -43,7 +43,7 @@ class Item(db.Model):
     )
     
     # Relationships
-    swap_requests = db.relationship('SwapRequest', foreign_keys='SwapRequest.item_id', backref='item', lazy=True, cascade='all, delete-orphan')
+    swap_requests = db.relationship('SwapRequest', foreign_keys='[SwapRequest.item_id]', backref='item', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Item {self.title}>'

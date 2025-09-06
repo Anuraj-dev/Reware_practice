@@ -217,7 +217,7 @@ def dashboard():
     outgoing_requests = SwapRequest.query.filter_by(requester_id=current_user.id).all()
     
     # Get swap requests for user's items
-    incoming_requests = SwapRequest.query.join(Item).filter(Item.user_id == current_user.id).all()
+    incoming_requests = SwapRequest.query.join(Item, SwapRequest.item_id == Item.id).filter(Item.user_id == current_user.id).all()
     
     return render_template("items/dashboard.html", 
                          current_user=current_user,
