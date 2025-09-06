@@ -35,9 +35,8 @@ def createListing():
         # Get form Data
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
-        category = request.form.get('category', '').strip()
-        size = request.form.get('size', 'M')
-        condition = request.form.get('condition', 'male')
+        category = request.form.get('category', 'male').strip()
+        size = request.form.get('size', 'M').strip()
         image_url = request.form.get('image_url', '').strip()
         points_cost = request.form.get('points_cost', type=int)
 
@@ -46,16 +45,12 @@ def createListing():
             flash('Title must be at least 3 characters long', 'danger')
             return redirect(url_for('item.renderNewPage'))
         
-        if not category:
-            flash('Category is required', 'danger')
-            return redirect(url_for('item.renderNewPage'))
-        
         if not points_cost or points_cost <= 0:
             flash('Points cost must be a positive number', 'danger')
             return redirect(url_for('item.renderNewPage'))
-        
-        if condition not in ['male', 'female', 'kids']:
-            flash('Invalid condition selected', 'danger')
+
+        if not category or category not in ['male', 'female', 'kids']:
+            flash('Invalid category selected', 'danger')
             return redirect(url_for('item.renderNewPage'))
         
         if size not in ['S', 'M', 'L', 'XL']:
@@ -69,7 +64,6 @@ def createListing():
             description=description,
             category=category,
             size=size,
-            condition=condition,
             image_url=image_url if image_url else None,
             points_cost=points_cost
         )
@@ -84,7 +78,8 @@ def createListing():
         db.session.rollback()
         flash('An error occurred while creating the listing. Please try again.', 'danger')
         return redirect(url_for('item.renderNewPage'))
-
+    
+    
 @item.route("/<int:item_id>")
 def showListing(item_id):
     current_item = Item.query.get_or_404(item_id)
@@ -129,9 +124,8 @@ def upadateListing(item_id):  # Kept your typo as requested
         # Get form data
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
-        category = request.form.get('category', '').strip()
-        size = request.form.get('size', 'M')
-        condition = request.form.get('condition', 'male')
+        category = request.form.get('category', 'male').strip()
+        size = request.form.get('size', 'M').strip()
         image_url = request.form.get('image_url', '').strip()
         points_cost = request.form.get('points_cost', type=int)
 
@@ -140,8 +134,8 @@ def upadateListing(item_id):  # Kept your typo as requested
             flash('Title must be at least 3 characters long', 'danger')
             return redirect(url_for('item.renderEditPage', item_id=item_id))
         
-        if not category:
-            flash('Category is required', 'danger')
+        if not category or category not in ['male', 'female', 'kids']:
+            flash('Invalid category selected', 'danger')
             return redirect(url_for('item.renderEditPage', item_id=item_id))
         
         if not points_cost or points_cost <= 0:
@@ -153,7 +147,6 @@ def upadateListing(item_id):  # Kept your typo as requested
         current_item.description = description
         current_item.category = category
         current_item.size = size
-        current_item.condition = condition
         current_item.image_url = image_url if image_url else None
         current_item.points_cost = points_cost
 

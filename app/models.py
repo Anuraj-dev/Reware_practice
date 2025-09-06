@@ -32,7 +32,7 @@ class Item(db.Model):
     category = db.Column(db.String(50), default='male', nullable=False)
     size = db.Column(db.String(20), default='M', nullable=True)
     image_url = db.Column(db.String(200), nullable=True)
-    points_cost = db.Column(db.Integer, nullable=False)
+    points_cost = db.Column(db.Integer, default=10, nullable=False)
     # status = db.Column(db.String(20), default='pending', nullable=False)  # pending/approved
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     
