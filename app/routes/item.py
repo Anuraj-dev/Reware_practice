@@ -13,7 +13,7 @@ def index():
 
     current_user = get_current_user()
 
-    return render_template("items/index.html", items=items, current_user=current_user)   #TODO
+    return render_template("items/index.html", current_user=current_user)   #TODO- Here write items=items,
 
 @item.route("/new")
 @login_required
