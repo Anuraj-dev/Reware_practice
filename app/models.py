@@ -29,9 +29,8 @@ class Item(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    category = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), default='male', nullable=False)
     size = db.Column(db.String(20), default='M', nullable=True)
-    condition = db.Column(db.String(20), default='male', nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
     points_cost = db.Column(db.Integer, nullable=False)
     # status = db.Column(db.String(20), default='pending', nullable=False)  # pending/approved
@@ -39,7 +38,7 @@ class Item(db.Model):
     
     # Check constraints
     __table_args__ = (
-        CheckConstraint("condition IN ('male', 'female', 'kids')", name='check_condition'),
+        CheckConstraint("category IN ('male', 'female', 'kids')", name='check_category'),
         CheckConstraint("size IN ('S', 'M', 'L', 'XL')", name='check_size'),
     )
     
