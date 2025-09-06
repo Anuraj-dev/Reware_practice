@@ -86,13 +86,13 @@ def showListing(item_id):
     current_user = get_current_user()
     
     # Check if user has already requested this item
-    existing_request = None
-    if current_user:
-        existing_request = SwapRequest.query.filter_by(
-            requester_id=current_user.id,
-            requested_item_id=item_id,
-            status='pending'
-        ).first()
+    # existing_request = None
+    # if current_user:
+    #     existing_request = SwapRequest.query.filter_by(
+    #         requester_id=current_user.id,
+    #         requested_item_id=item_id,
+    #         status='pending'
+    #     ).first()
 
     return render_template("items/show.html", item=current_item, current_user=current_user, existing_request=existing_request)
 
