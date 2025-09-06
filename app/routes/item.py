@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, redirect, url_for, request, flash, session, jsonify
 from app import db
-from app.models import Item,  User, SwapRequest
+from app.models import Item,  User
 from app.routes.auth import login_required, get_current_user
 from sqlalchemy import or_, and_
 from datetime import datetime
@@ -84,18 +84,8 @@ def createListing():
 def showListing(item_id):
     current_item = Item.query.get_or_404(item_id)
     current_user = get_current_user()
-    
-    # Check if user has already requested this item
-    # existing_request = None
-    # if current_user:
-    #     existing_request = SwapRequest.query.filter_by(
-    #         requester_id=current_user.id,
-    #         requested_item_id=item_id,
-    #         status='pending'
-    #     ).first()
 
-    return render_template("items/show.html", item=current_item, current_user=current_user, existing_request=existing_request)
-
+    return render_template("items/show.html", item=current_item, current_user=current_user)
 @item.route("/<int:item_id>/edit")
 @login_required
 def renderEditPage(item_id):
