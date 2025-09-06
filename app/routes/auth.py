@@ -110,6 +110,7 @@ def register_post():
     except Exception as e:
         db.session.rollback()
         flash('An error occurred during registration. Please try again.', 'danger')
+        print(e)
         return render_template("auth/register.html")                #!Modification may be required
 
 
