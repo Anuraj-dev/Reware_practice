@@ -179,4 +179,4 @@ def deleteListing(item_id):
 @item.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("items/index.html")
+    return render_template("items/dashboard.html")

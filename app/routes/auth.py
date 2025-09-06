@@ -158,7 +158,7 @@ def login_post():
         if next_page:
             return redirect(next_page)
         
-        return redirect(url_for('item.dashboard'))                   #!Modification may be required
+        return redirect(url_for('item.index'))                   #!Modification may be required
         
     except Exception as e:
         flash('An error occurred during login. Please try again.', 'danger')
