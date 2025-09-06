@@ -21,7 +21,7 @@ def create_app():
 
     @app.route("/")
     def root():
-        return render_template("landing_page.html")
+        return render_template("/items/index.html")
 
 
     migrate = Migrate(app, db)
