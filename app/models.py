@@ -16,7 +16,7 @@ class User(db.Model):
     
     # Relationships
     items = db.relationship('Item', backref='owner', lazy=True, cascade='all, delete-orphan')
-    swap_requests = db.relationship('SwapRequest', backref='requester', lazy=True, cascade='all, delete-orphan')
+    swap_requests = db.relationship('SwapRequest', foreign_keys='SwapRequest.requester_id', backref='requester', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<User {self.username}>'
@@ -43,7 +43,7 @@ class Item(db.Model):
     )
     
     # Relationships
-    swap_requests = db.relationship('SwapRequest', backref='item', lazy=True, cascade='all, delete-orphan')
+    swap_requests = db.relationship('SwapRequest', foreign_keys='SwapRequest.item_id', backref='item', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Item {self.title}>'
@@ -54,13 +54,17 @@ class SwapRequest(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     requester_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)  
+    offered_item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
     status = db.Column(db.String(20), default='pending', nullable=False)  # pending/completed/declined
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     
     __table_args__ = (
         CheckConstraint("status IN ('pending', 'completed', 'declined')", name='check_status'),
     )
+    
+    # Relationships
+    offered_item = db.relationship('Item', foreign_keys=[offered_item_id])
     
     def __repr__(self):
         return f'<SwapRequest {self.id}>'
