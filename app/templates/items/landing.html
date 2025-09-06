@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Rewear · Swap smart, waste less{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* Minimal page-specific overrides if needed can go here */
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section hero">
+  <video id="heroVideo" class="bgvid" playsinline muted loop preload="auto" aria-hidden="true">
+    <source src="{{ url_for('static', filename='videos/video1.mp4') }}" type="video/mp4">
+  </video>
+  <div class="copy container">
+    <span class="kicker">Sustainable Swapping</span>
+    <h1>Give items a second life with Rewear</h1>
+    <p class="lead">Swap items with your community and earn points. Reduce waste and find quality pieces you’ll love.</p>
+  </div>
+  <div class="cta-floating">
+    <a class="btn" href="{{ url_for('auth.register') }}">Get started</a>
+    <a class="btn ghost" href="{{ url_for('auth.login') }}">I already have an account</a>
+  </div>
+</section>
+
+<section class="alt-sections">
+  <div class="container">
+    <div class="alt-row">
+      <div class="alt-media"><img src="{{ url_for('static', filename='images/image1.jpg') }}" alt="About Rewear image 1"></div>
+      <div class="alt-copy">
+        <h3>Resell, Reuse, Rewear</h3>
+        <p>We connect people to swap quality items, giving them a longer life and reducing waste.</p>
+      </div>
+    </div>
+    <div class="alt-row reverse">
+      <div class="alt-copy">
+        <h3>Seamless Swapping</h3>
+        <p>Earn points by listing items, then redeem those points for things you need—simple and fun.</p>
+      </div>
+      <div class="alt-media"><img src="{{ url_for('static', filename='images/image2.jpg') }}" alt="About Rewear image 2"></div>
+    </div>
+    <div class="alt-row">
+      <div class="alt-media"><img src="{{ url_for('static', filename='images/image3.jpg') }}" alt="About Rewear image 3"></div>
+      <div class="alt-copy">
+        <h3>Curated Quality</h3>
+        <p>Discover better items with clear photos and honest descriptions, curated by the community.</p>
+      </div>
+    </div>
+    <div class="alt-row reverse">
+      <div class="alt-copy">
+        <h3>Local and Circular</h3>
+        <p>Swap with people near you and be part of a circular economy that benefits everyone.</p>
+      </div>
+      <div class="alt-media"><img src="{{ url_for('static', filename='images/image4.jpg') }}" alt="About Rewear image 4"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

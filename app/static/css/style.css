@@ -1,0 +1,79 @@
+/* Global containers */
+.container { width: min(1200px, 92%); margin: 0 auto; }
+.container-fluid { width: 100%; margin: 0; padding-inline: clamp(12px, 3vw, 32px); }
+
+/* Brand styling */
+.brand { display:flex; align-items:center; gap:.6rem; font-weight:700; }
+.brand img { width: 72px; height: 72px; }
+.brand-name {
+  font-family: 'Playfair Display', 'Montserrat', serif;
+  font-weight: 800;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+/* Navbar links */
+.navlinks { display:flex; align-items:center; gap:.6rem; }
+.navlinks a { padding: .5rem .9rem; border-radius: 10px; }
+.navlinks a:hover { background: var(--accent); }
+.cta-btn { background: var(--primary); color: #fff; padding: .55rem 1rem; border-radius: 12px; box-shadow: var(--shadow); }
+.cta-btn:hover { filter: brightness(0.95); }
+
+/* Buttons */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; cursor:pointer; border:0; border-radius:12px; padding:.7rem 1rem; background: var(--primary); color:#fff; font-weight:600; box-shadow: var(--shadow); }
+.btn.ghost { background: transparent; color: var(--secondary); border: 1px solid color-mix(in oklab, var(--secondary) 40%, transparent); }
+.btn.secondary { background: var(--secondary); }
+
+/* Hero background video */
+.hero { position: relative; min-height: 100vh; display:grid; align-items:stretch; padding:0; overflow: clip; }
+.hero .bgvid { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.hero::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 45%, rgba(255,255,255,0.35) 100%); }
+.hero .copy { position:relative; z-index:2; min-height:100vh; display:grid; align-content:center; gap:1rem; color:#000; }
+.hero .kicker { font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:clamp(.9rem,1.2vw,1.05rem); }
+.hero h1 { font-family: 'Montserrat', sans-serif; font-size: clamp(2rem, 6vw, 4rem); line-height:1.05; }
+.hero .lead { font-size: clamp(1.05rem, 1.6vw, 1.4rem); max-width: 60ch; }
+.cta-floating { position:absolute; left:50%; bottom:clamp(16px,4vw,40px); transform:translateX(-50%); z-index:3; display:flex; gap:.8rem; align-items:center; justify-content:center; flex-wrap:wrap; padding:0; background:transparent; }
+
+/* Alternating image/text sections */
+.alt-sections { padding: clamp(1.8rem, 3vw, 3rem) 0; }
+.alt-row { display:grid; grid-template-columns: 1.1fr .9fr; gap: 1rem; align-items:center; margin-bottom: 1rem; }
+.alt-row .alt-media img { width:100%; height:auto; border-radius: 16px; box-shadow: var(--shadow); }
+.alt-row .alt-copy { padding: clamp(1rem, 2vw, 1.5rem); }
+/* Make text larger next to images */
+.alt-row .alt-copy h3 { font-size: clamp(1.8rem, 2.8vw, 2.4rem); line-height: 1.15; font-weight: 700; }
+.alt-row .alt-copy p { font-size: clamp(1.1rem, 1.8vw, 1.35rem); line-height: 1.65; }
+.alt-row.reverse { grid-template-columns: .9fr 1.1fr; }
+@media (max-width: 900px) {
+  .alt-row, .alt-row.reverse { grid-template-columns: 1fr; }
+}
+
+/* Auth split layouts */
+.auth-split { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: stretch; }
+.auth-split .auth-card { background:#fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; }
+.auth-split .auth-visual { position: relative; overflow: hidden; border-radius: var(--radius); box-shadow: var(--shadow); }
+.auth-split .auth-visual img { width: 100%; height: 100%; object-fit: cover; display:block; transition: transform .35s ease, opacity .35s ease; }
+.auth-split .auth-visual img.swap-out { transform: scale(1.06) translateX(5%); opacity: .75; }
+@media (max-width: 900px) { .auth-split { grid-template-columns: 1fr; } }
+
+/* Auth card subtle transition */
+.slide-fade-out { animation: slideFadeOut .35s ease forwards; }
+@keyframes slideFadeOut {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(6px); opacity: 0; }
+}
+
+/* Forms */
+.form { width: min(520px, 100%); margin: 1rem auto; }
+.form .field { display:grid; gap:.4rem; margin-bottom:.9rem; }
+.form label { font-weight:600; }
+.form input[type="text"], .form input[type="email"], .form input[type="password"] { padding:.7rem .85rem; border-radius:12px; border: 1px solid color-mix(in oklab, var(--secondary) 25%, transparent); background: #fff; color: var(--text); }
+.form .help { font-size:.9rem; opacity:.85; }
+
+/* Cards/sections */
+.card { background:#fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+.section { padding: clamp(1.5rem, 3vw, 3rem) 0; }
+.grid { display:grid; gap: 1.2rem; }
+.grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .grid.cols-3 { grid-template-columns: 1fr; } }

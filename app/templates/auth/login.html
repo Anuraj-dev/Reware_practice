@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Login · Rewear{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container auth-split">
+    <div class="auth-card">
+      <h1>Welcome back</h1>
+      <p class="help">Log in to continue swapping.</p>
+      <form id="loginForm" class="form" method="POST" action="{{ url_for('auth.login') }}">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="••••••••" required />
+        </div>
+        <div class="field" style="display:flex;align-items:center;gap:.5rem;">
+          <input id="remember_me" name="remember_me" type="checkbox" />
+          <label for="remember_me" style="margin:0;">Remember me</label>
+        </div>
+        <div style="display:flex; gap:.6rem; align-items:center;">
+          <button class="btn" type="submit">Login</button>
+          <a class="btn ghost" href="{{ url_for('auth.register') }}" data-auth-transition="register">Create account</a>
+        </div>
+      </form>
+    </div>
+    <div class="auth-visual">
+      <img id="loginVisual" src="{{ url_for('static', filename='images/image4.jpg') }}" alt="Login to Rewear visual">
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
