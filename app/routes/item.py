@@ -84,3 +84,9 @@ def upadateListing(item_id):
         flash('An error occurred while updating the listing. Please try again.', 'danger')
         return redirect(url_for('item.renderEditPage', item_id=item_id))
     
+#Create Swap request route
+@item.route("/<item_id>/swap", methods=["POST"])
+@login_required
+def createSwapRequest(item_id):
+    
+    return redirect(url_for('item.showListing', item_id=item_id))
