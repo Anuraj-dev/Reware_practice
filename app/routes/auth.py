@@ -141,7 +141,7 @@ def login_post():
             return render_template("auth/login.html")                   #!Modification may be required
         
         # Log in user
-        session['user_id'] = user.user_id
+        session['user_id'] = user.user.id
         session['username'] = user.username
         session['is_admin'] = user.is_admin
         session['user_points'] = user.points
@@ -163,3 +163,9 @@ def login_post():
         flash('An error occurred during login. Please try again.', 'danger')
         return render_template("auth/login.html")                   #!Modification may be required
 
+@auth.route("/logout")
+@login_required
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('root'))
