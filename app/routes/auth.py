@@ -84,7 +84,7 @@ def register_post():
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash('Email address already registered.', 'danger')
-            return render_template("authregister.html")
+            return render_template("auth/register.html")
         
         # Check if username is taken
         existing_username = User.query.filter_by(username=username).first()
