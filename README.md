@@ -67,3 +67,7 @@ Set `SECRET_KEY` in the environment before you run the app anywhere other people
 - Nothing changes a points balance after registration, so the points cost is a label for now.
 - `app/routes/admin.py` is empty and no admin pages are routed. Admins can only edit or delete listings.
 - The app has no password reset, no email confirmation, no CSRF protection on its forms and no tests.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
